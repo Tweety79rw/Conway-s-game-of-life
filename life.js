@@ -74,7 +74,9 @@ $(document).ready(function(){
 		.attr('height',h);
 	var commands = div.append('div')
 		.attr('class','commands');
-	
+	div.append("p")
+		.attr('id','whoby')
+		.html('Created by<br>Ryan Wilson');
 			
 	commands.append('div').attr('class','slider-container')
 		.append('input')
