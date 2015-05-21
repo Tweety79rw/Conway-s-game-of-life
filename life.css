@@ -1,0 +1,54 @@
+
+body {
+  padding: 0px;
+  margin: 0px;
+}
+
+rect {
+  fill: none;
+  pointer-events: all;
+}
+.cell.alive {
+  fill: #000;
+  stroke: #000;
+}
+.cell.dead {
+  fill: #ddd;
+  stroke: #999;
+}
+.slider-container{
+	float: left;
+	background-color: grey;
+}
+.btn-group{
+  float: right;
+}
+.commands{
+	background-color: grey;
+	width: 960px;
+	display:table;
+	padding: 1em;
+	border-top-style: solid;
+	border-top-width: 1em;
+}
+.main-container {
+  width: 960px;
+  margin: 3em auto;
+  text-align: center;
+}
+svg{
+  margin-bottom: -5px;
+}
+#donationButton{
+	position:absolute;
+	left:21%;
+ }
+ .adsbygoogle{
+	width:24%;
+}
+.leftAd{
+  float:left;
+}
+.rightAd{
+	float:right;
+}
