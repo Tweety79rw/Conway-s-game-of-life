@@ -2,7 +2,7 @@ $(document).ready(function(){
 	
 	var w = 960,
 		h = 500,
-		sz = 20,
+		sz = 7,
 		r = sz / 2,
 		sr = r * r,
 		ssz = sz * sz,
@@ -71,7 +71,12 @@ $(document).ready(function(){
 		
 	var board = div.append('svg')
 		.attr('width',w)
-		.attr('height',h);
+		.attr('height',h)
+		.on('contextmenu',function(d){
+			d3.event.preventDefault();
+			d3.event.stopPropagation();
+			return false;
+		});
 	var commands = div.append('div')
 		.attr('class','commands');
 	div.append("p")
@@ -88,7 +93,7 @@ $(document).ready(function(){
 		.text('Speed ' +Math.floor(runTime/1000).toFixed(2)+' seconds');
 		
 	$('#slider')
-		.slider({step:.25,min:.25,max:5,value:Math.floor(runTime/1000)})
+		.slider({step:.01,min:.01,max:5,value:Math.floor(runTime/1000)})
 		.on('slide',function(slideEvt){
 			$('#slider').text(slideEvt.value+"s");
 			d3.select('.slider-container').select('p')
@@ -134,7 +139,8 @@ $(document).ready(function(){
 			}
 			reset();});		
 	$(document).mouseup(function() {
-	isMouseDown = false;});
+		isMouseDown = false;
+	});
 	
 	var topCell = function(c) { return cells[Math.max(0, c.r - 1) * cols + c.c]; };
 	var leftCell = function(c) { return cells[c.r * cols + Math.max(0, c.c - 1)]; };
@@ -145,49 +151,51 @@ $(document).ready(function(){
 	var bottomLeftCell = function(c) { return cells[Math.min(rows - 1, c.r + 1) * cols + Math.max(0, c.c - 1)]; };
 	var bottomRightCell = function(c) { return cells[Math.min(rows - 1, c.r + 1) * cols + Math.min(cols - 1, c.c + 1)]; };
 	var topRightCell = function(c) { return cells[Math.max(0, c.r - 1) * cols + Math.min(cols - 1, c.c + 1)]; };
-	var click = function(d){
+	var click = function(d,set){
 		d3.event.preventDefault()
 		d3.event.stopPropagation();
-		d.alive = !d.alive;
+		d.alive = set;
 		update(cells);
 		};
-	function reset(){
+	var reset = function(){
 		cells.forEach(function(d){d.alive = false;});
 		update(cells);
 	}
-	function check_neighbors(el){
+	var check_neighbors = function(el){
 		var newCell = $.extend(true, {}, el);
 		newCell.elnt = null;
-		var neighbors = cells.filter(function(obj){ return (obj.r >= el.r-1 && obj.r <= el.r+1);})
-		.filter(function(obj2) {return ((obj2.c >= el.c-1 && obj2.c <= el.c+1) && !(obj2.c === el.c && obj2.r === el.r) );})
-		.filter(function(al){return al.alive === true;});
-		if(newCell.alive===true){
-			if(neighbors.length < 2 || neighbors.length > 3)
-				newCell.alive = false;
-			else
-				newCell.alive = true;
-			
-		}else{
-			if(neighbors.length===3)
-				newCell.alive = true;
-			else
-				newCell.alive = false;
-		}
+		//var neighbours = cells.filter(function(obj){ return (obj.r >= el.r-1 && obj.r <= el.r+1);})
+		//.filter(function(obj2) {return ((obj2.c >= el.c-1 && obj2.c <= el.c+1) && !(obj2.c === el.c && obj2.r === el.r) );})
+		//.filter(function(al){return al.alive === true;});
+		// this improves the speed that it collects the neighbours of the cell
+		var neighbours = [];
+		neighbours.push(cells[(el.r-1)*cols + (el.c-1)]);
+		neighbours.push(cells[(el.r)*cols + (el.c-1)]);
+		neighbours.push(cells[(el.r+1)*cols + (el.c-1)]);
+		neighbours.push(cells[(el.r-1)*cols + (el.c)]);
+		neighbours.push(cells[(el.r+1)*cols + (el.c)]);
+		neighbours.push(cells[(el.r-1)*cols + (el.c+1)]);
+		neighbours.push(cells[(el.r)*cols + (el.c+1)]);
+		neighbours.push(cells[(el.r+1)*cols + (el.c+1)]);
+		neighbours = neighbours.filter(function(al){return al && al.alive === true;});
+		//if(newCell.alive===true){
+		newCell.alive = (newCell.alive && neighbours.length >= 2 && neighbours.length <= 3) || (!newCell.alive && neighbours.length===3);
+		//}else{
+		//	newCell.alive = neighbours.length===3;
+		//}
 		return newCell;
 	}
-	function run(){
-		
+	var run = function(){
 		var newCells = [];
 		var count = 0;
 		for(var i = 0; i < cells.length; i++){
-			newCells.push(check_neighbors(cells[i]));
+			newCells.push(check_neighbors(cells[i],i));
 			count++;
 		}
-		console.log(count);
 		cells = newCells;
 		update(cells);
 	}
-	function update(data_cells){
+	var update = function(data_cells){
 		var cell = board.selectAll(".cell")
 		  .data(data_cells);
 		
@@ -202,11 +210,18 @@ $(document).ready(function(){
 		  .each(function(d) {
 			d3.select(this).on('mousedown',function(d){
 				isMouseDown = true;
-				click(d);
-				return false;})
-				.on('mouseover',function(d){
-					if(isMouseDown)
-				click(d);});
+				click(d,d3.event.button === 0);
+				return false;
+			}).on('mouseover',function(d){
+				if(isMouseDown)
+					click(d,d3.event.button === 0);
+				return false;
+			}).on('mouseup',function(d){
+				isMouseDown = false;
+				d3.event.preventDefault();
+				d3.event.stopPropagation();
+				return false;
+			});
 			d.elnt = d3.select(this);
 		  });
 		  
