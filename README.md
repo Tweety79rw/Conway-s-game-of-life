@@ -12,3 +12,5 @@ Four basic rules govern how this works
 The slide bar controls how fast the generations pass.
 
 I believe the other buttons are self explanatory.
+
+new code version located at https://github.com/Tweety79rw/Ryans-Stuff/tree/master/HttpPage/src/main/resources/static
