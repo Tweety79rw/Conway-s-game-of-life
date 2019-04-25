@@ -14,3 +14,8 @@ The slide bar controls how fast the generations pass.
 I believe the other buttons are self explanatory.
 
 new code version located at https://github.com/Tweety79rw/Ryans-Stuff/tree/master/HttpPage/src/main/resources/static
+
+
+# Demo
+
+[Here](http://tweety79rw.github.io/Conway-s-game-of-life/)
